@@ -6,7 +6,7 @@ and performance.
 ---
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/snabbdom/snabbdom/actions/workflows/steps.yml/badge.svg)](https://github.com/snabbdom/snabbdom/actions/workflows/steps.yml)
+[![Build Status](https://github.com/snabbdom/snabbdom/actions/workflows/test.yml/badge.svg)](https://github.com/snabbdom/snabbdom/actions/workflows/test.yml)
 [![npm version](https://badge.fury.io/js/snabbdom.svg)](https://badge.fury.io/js/snabbdom)
 [![npm downloads](https://img.shields.io/npm/dm/snabbdom.svg)](https://www.npmjs.com/package/snabbdom)
 [![Join the chat at https://gitter.im/snabbdom/snabbdom](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/snabbdom/snabbdom?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -128,7 +128,7 @@ patch(vnode, newVnode); // Snabbdom efficiently updates the old view to the new 
     - [Unmounting](#unmounting)
   - [`h`](#h)
   - [`fragment`](#fragment-experimental) (experimental)
-  - [`tovnode`](#tovnode)
+  - [`toVNode`](#tovnode)
   - [Hooks](#hooks)
     - [Overview](#overview)
     - [Usage](#usage)
@@ -157,7 +157,7 @@ patch(vnode, newVnode); // Snabbdom efficiently updates the old view to the new 
 - [Virtual Node](#virtual-node)
   - [sel : String](#sel--string)
   - [data : Object](#data--object)
-  - [children : Array<vnode>](#children--arrayvnode)
+  - [children : Array\<vnode\>](#children--arrayvnode)
   - [text : string](#text--string)
   - [elm : Element](#elm--element)
   - [key : string | number](#key--string--number)
@@ -229,14 +229,14 @@ Of course, then there is still a single comment node at the mount point.
 ### `h`
 
 It is recommended that you use `h` to create vnodes. It accepts a
-tag/selector as a string, an optional data object, and an optional string or
-an array of children.
+[tag/selector](#sel--string) as a string, an optional data object, and an
+optional string or an array of children.
 
 ```mjs
 import { h } from "snabbdom";
 
-const vnode = h("div", { style: { color: "#000" } }, [
-  h("h1", "Headline"),
+const vnode = h("div#container", { style: { color: "#000" } }, [
+  h("h1.primary-title", "Headline"),
   h("p", "A paragraph")
 ]);
 ```
@@ -244,7 +244,7 @@ const vnode = h("div", { style: { color: "#000" } }, [
 ### `fragment` (experimental)
 
 Caution: This feature is currently experimental and must be opted in.
-Its API may be changed without an major version bump.
+Its API may be changed without a major version bump.
 
 ```mjs
 const patch = init(modules, undefined, {
@@ -262,33 +262,30 @@ import { fragment, h } from "snabbdom";
 const vnode = fragment(["I am", h("span", [" a", " fragment"])]);
 ```
 
-### `tovnode`
+### `toVNode`
 
-Converts a DOM node into a virtual node. Especially good for patching over an pre-existing,
-server-side generated content.
+Converts a DOM node into a virtual node. Especially good for patching over pre-existing,
+server-side generated HTML content.
 
 ```mjs
 import {
   init,
-  classModule,
-  propsModule,
   styleModule,
-  eventListenersModule,
+  attributesModule,
   h,
   toVNode
 } from "snabbdom";
 
 const patch = init([
-  // Init patch function with chosen modules
-  classModule, // makes it easy to toggle classes
-  propsModule, // for setting properties on DOM elements
-  styleModule, // handles styling on elements with support for animations
-  eventListenersModule // attaches event listeners
+  // Initialize a `patch` function with the modules used by `toVNode`
+  attributesModule // handles attributes from the DOM node
+  datasetModule, // handles `data-*` attributes from the DOM node
 ]);
 
 const newVNode = h("div", { style: { color: "#000" } }, [
   h("h1", "Headline"),
-  h("p", "A paragraph")
+  h("p", "A paragraph"),
+  h("img", { attrs: { src: "sunrise.png", alt: "morning sunrise" } })
 ]);
 
 patch(toVNode(document.querySelector(".container")), newVNode);
@@ -398,10 +395,10 @@ Modules work by registering global listeners for [hooks](#hooks). A module is si
 
 ```mjs
 const myModule = {
-  create: function (oldVnode, vnode) {
+  create: (oldVnode, vnode) => {
     // invoked whenever a new virtual node is created
   },
-  update: function (oldVnode, vnode) {
+  update: (oldVnode, vnode) => {
     // invoked whenever a virtual node is updated
   }
 };
@@ -651,7 +648,7 @@ In particular, you should **not** do something like this:
 ```mjs
 // Does not work
 const sharedHandler = {
-  change: function (e) {
+  change: (e) => {
     console.log("you chose: " + e.target.value);
   }
 };
@@ -676,7 +673,7 @@ Alternatively, simply make sure each node is passed unique `on` values:
 
 ```mjs
 // Works
-const sharedHandler = function (e) {
+const sharedHandler = (e) => {
   console.log("you chose: " + e.target.value);
 };
 h("div", [
@@ -859,11 +856,39 @@ const fragment = (
 - [elm](#elm--element)
 - [key](#key--string--number)
 
-### sel : String
+### sel : string
 
-The `.sel` property of a virtual node is the CSS selector passed to
-[`h()`](#snabbdomh) during creation. For example: `h('div#container', {}, [...])` will create a virtual node that has `div#container` as
-its `.sel` property.
+The `sel` property specifies the HTML element of the vnode, optionally its `id`
+prefixed by a `#`, and zero or more classes each prefixed by a `.`. The syntax
+is inspired by CSS selectors. Here are a few examples:
+
+- `div#container.bar.baz` – A `div` element with the id `container` and the
+  classes `bar` and `baz`.
+- `li` – A `li` element with no `id` nor classes.
+- `button.alert.primary` – `button` element with the two classes `alert` and
+  `primary`.
+
+The selector is meant to be _static_, that is, it should not change over the
+lifetime of the element. To set a dynamic `id` use [the props
+module](#the-props-module) and to set dynamic classes use [the class
+module](#the-class-module).
+
+Since the selector is static, Snabbdom uses it as part of a vnodes identity. For
+instance, if the two child vnodes
+
+```mjs
+[h("div#container.padding", children1), h("div.padding", children2)];
+```
+
+are patched against
+
+```ts
+[h("div#container.padding", children2), h("div.padding", children1)];
+```
+
+then Snabbdom uses the selector to identify the vnodes and reorder them in the
+DOM tree instead of creating new DOM element. This use of selectors avoids the
+need to specify keys in many cases.
 
 ### data : Object
 
@@ -886,7 +911,7 @@ For example `h('div', {props: {className: 'container'}}, [...])` will produce a 
 
 as its `.data` object.
 
-### children : Array<vnode>
+### children : Array\<vnode\>
 
 The `.children` property of a virtual node is the third (optional)
 parameter to [`h()`](#snabbdomh) during creation. `.children` is

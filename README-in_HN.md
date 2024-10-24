@@ -5,7 +5,7 @@
 ---
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://github.com/snabbdom/snabbdom/actions/workflows/steps.yml/badge.svg)](https://github.com/snabbdom/snabbdom/actions/workflows/steps.yml)
+[![Build Status](https://github.com/snabbdom/snabbdom/actions/workflows/test.yml/badge.svg)](https://github.com/snabbdom/snabbdom/actions/workflows/test.yml)
 [![npm version](https://badge.fury.io/js/snabbdom.svg)](https://badge.fury.io/js/snabbdom)
 [![npm downloads](https://img.shields.io/npm/dm/snabbdom.svg)](https://www.npmjs.com/package/snabbdom)
 [![Join the chat at https://gitter.im/snabbdom/snabbdom](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/snabbdom/snabbdom?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -390,10 +390,10 @@ patch(vnode1, vnode2);
 
 ```mjs
 const myModule = {
-  create: function (oldVnode, vnode) {
+  create: (oldVnode, vnode) => {
     // invoked whenever a new virtual node is created
   },
-  update: function (oldVnode, vnode) {
+  update: (oldVnode, vnode) => {
     // invoked whenever a virtual node is updated
   }
 };
@@ -640,7 +640,7 @@ In particular, you should **not** do something like this:
 ```mjs
 // Does not work
 const sharedHandler = {
-  change: function (e) {
+  change: (e) => {
     console.log("you chose: " + e.target.value);
   }
 };
@@ -665,7 +665,7 @@ h("div", [
 
 ```mjs
 // Works
-const sharedHandler = function (e) {
+const sharedHandler = (e) => {
   console.log("you chose: " + e.target.value);
 };
 h("div", [

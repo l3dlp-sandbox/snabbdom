@@ -7,7 +7,7 @@ import { Classes } from "./modules/class";
 import { Props } from "./modules/props";
 import { Dataset } from "./modules/dataset";
 
-export type Key = string | number | symbol;
+export type Key = PropertyKey;
 
 export interface VNode {
   sel: string | undefined;
@@ -18,8 +18,8 @@ export interface VNode {
   key: Key | undefined;
 }
 
-export interface VNodeData {
-  props?: Props;
+export interface VNodeData<VNodeProps = Props> {
+  props?: VNodeProps;
   attrs?: Attrs;
   class?: Classes;
   style?: VNodeStyle;

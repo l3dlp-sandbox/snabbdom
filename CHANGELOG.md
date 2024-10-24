@@ -1,3 +1,34 @@
+## [3.6.2](https://github.com/snabbdom/snabbdom/compare/v3.6.1...v3.6.2) (2024-01-31)
+
+### Bug Fixes
+
+- detect opportunity to insert new vnode earlier for more efficient DOM manipulation ([#1106](https://github.com/snabbdom/snabbdom/issues/1106)) ([4383817](https://github.com/snabbdom/snabbdom/commit/438381794e2e664d9eb4970f0a46618635cf75e1)), closes [#1099](https://github.com/snabbdom/snabbdom/issues/1099)
+
+## [3.6.1](https://github.com/snabbdom/snabbdom/compare/v3.6.0...v3.6.1) (2024-01-30)
+
+### Bug Fixes
+
+- work around bug in ts-add-js-extension ([#1105](https://github.com/snabbdom/snabbdom/issues/1105)) ([649c760](https://github.com/snabbdom/snabbdom/commit/649c760f79a00a1a484a6258d74b27adcfcf69d0)), closes [#1087](https://github.com/snabbdom/snabbdom/issues/1087) [#1102](https://github.com/snabbdom/snabbdom/issues/1102)
+
+# [3.6.0](https://github.com/snabbdom/snabbdom/compare/v3.5.1...v3.6.0) (2024-01-20)
+
+Note: Do to improvements to the JSX typings the minimum supported TypeScript version is now 4.1.
+
+### Bug Fixes
+
+- allow innerHTML to replace non-empty node, credit [@tokichie](https://github.com/tokichie) ([#1083](https://github.com/snabbdom/snabbdom/issues/1083)) ([c063d57](https://github.com/snabbdom/snabbdom/commit/c063d57f8878d38483973c19615d04aaf06dd77f))
+- correct minimum node version to one that supports modules ([#1085](https://github.com/snabbdom/snabbdom/issues/1085)) ([5fa4e84](https://github.com/snabbdom/snabbdom/commit/5fa4e8480814401a18b90dca8d48069eed32d097))
+- detect window.requestAnimationFrame function before calling ([#1082](https://github.com/snabbdom/snabbdom/issues/1082)) ([ba080f5](https://github.com/snabbdom/snabbdom/commit/ba080f5a4df1437fb6a208c871411c7420df5b4c))
+- generate valid javascript modules in build ([#1080](https://github.com/snabbdom/snabbdom/issues/1080)) ([7ec0e90](https://github.com/snabbdom/snabbdom/commit/7ec0e9018a5c1c239a9dab5b81854275f7bf7724)), closes [#963](https://github.com/snabbdom/snabbdom/issues/963)
+- handle falsy values correctly in the dataset and style modules ([#1094](https://github.com/snabbdom/snabbdom/issues/1094)) ([60c6041](https://github.com/snabbdom/snabbdom/commit/60c604159038680cdd70d9725d2a209746569bb8)), closes [#303](https://github.com/snabbdom/snabbdom/issues/303) [#1093](https://github.com/snabbdom/snabbdom/issues/1093)
+- minor typo in code comment ([#1043](https://github.com/snabbdom/snabbdom/issues/1043)) ([794f6c2](https://github.com/snabbdom/snabbdom/commit/794f6c210d25d6b095154b559828292359e1d298))
+- patch should apply textNodes ([#1062](https://github.com/snabbdom/snabbdom/issues/1062)) ([404b753](https://github.com/snabbdom/snabbdom/commit/404b7536546b5a0ca117a38585caf2b5a58e82c5)), closes [#971](https://github.com/snabbdom/snabbdom/issues/971) [#972](https://github.com/snabbdom/snabbdom/issues/972)
+- patching namespaced attributes ([#1049](https://github.com/snabbdom/snabbdom/issues/1049)) ([#1061](https://github.com/snabbdom/snabbdom/issues/1061)) ([8c67f42](https://github.com/snabbdom/snabbdom/commit/8c67f426b678d8823945e967dd94aea82e0659e8))
+
+### Features
+
+- optimise detection of data and svg names ([#1058](https://github.com/snabbdom/snabbdom/issues/1058)) ([71813ff](https://github.com/snabbdom/snabbdom/commit/71813ff5583a01813296a4604326f47f7c2dfb15))
+
 ## [3.5.1](https://github.com/snabbdom/snabbdom/compare/v3.5.0...v3.5.1) (2022-06-22)
 
 ### Bug Fixes
@@ -234,7 +265,7 @@ Whether or not to set a boolean attribute is now determined by looking at the va
 ```js
 h("div", {
   attrs: {
-    foo: true // will be set a boolean attribute since `true` is a boolean
+    foo: true, // will be set a boolean attribute since `true` is a boolean
     bar: "baz" // will set a normal attribute
   }
 });
@@ -366,10 +397,12 @@ The biggest change in this release is that the Snabbdom source code has been por
 The TypeScript rewrite uses the `import` and `export` features introduced in ECMAScript 2015. Unfortunately the ES imports have no analogy to the CommonJS pattern of setting `module.exports`. This means that the Snabbdom modules that previously used this feature now have to be imported in a slightly different way.
 
 ```js
-var h = require("snabbdom/h"); // The old way
-var h = require("snabbdom/h").h; // The new way
-var h = require("snabbdom/h").default; // Alternative new way
-var { h } = require("snabbdom/h"); // Using destructuring
+/* eslint-disable no-redeclare */
+const h = require("snabbdom/h"); // The old way
+const h = require("snabbdom/h").h; // The new way
+const h = require("snabbdom/h").default; // Alternative new way
+const { h } = require("snabbdom/h"); // Using destructuring
+/* eslint-enable no-redeclare */
 ```
 
 ## [v0.6.0] - 2017-01-05
